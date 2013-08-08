@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='distmesh2d',
-    version='0.0.1',
+    version='0.0.2',
     url="https://github.com/fmuzf/py_distmesh2d",
+    description='A Python re-implementation of distmesh2d by Persson and Strang',
     packages=find_packages(),
-    license='MIT',
     install_requires=[
         "distribute",
         "numpy >= 1.7.0",
