@@ -1,3 +1,9 @@
+distmeth2d
+==========
+
+A Python re-implementation of distmesh2d by Persson and Strang 
+
+
 This repository contains a Python re-implementation of `distmesh2d` in *P.-O. Persson, G. Strang, A Simple Mesh Generator in MATLAB. SIAM Review, Volume 46 (2), pp. 329-345, June 2004* (http://persson.berkeley.edu/distmesh/).
 
 * This code implements the original function described in the 2004 paper and
@@ -12,3 +18,8 @@ This repository contains a Python re-implementation of `distmesh2d` in *P.-O. Pe
 It seems to work, though:
 
 ![example 3](https://raw.github.com/ckhroulev/py_distmesh2d/master/example3.png)
+
+
+Installation
+------------
+    $ python setup.py install
