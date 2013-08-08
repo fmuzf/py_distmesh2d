@@ -1,5 +1,6 @@
 from pylab import figure, triplot, tripcolor, axis, axes, show
 from distmesh2d import *
+from distmesh2d.distance import * 
 import numpy as np
 
 def example1(pts):
