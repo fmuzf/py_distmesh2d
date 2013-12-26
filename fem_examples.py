@@ -1,13 +1,12 @@
-from pylab import figure, triplot, tripcolor, axis, axes, show
 import numpy as np
+import matplotlib.pyplot as plt
 
 from py_distmesh2d import *
 from poisson import poisson
-from mesh_examples import plot_mesh
+from meshtools import plot_mesh, plot_mesh_indexed
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm, tri
-import matplotlib.pyplot as plt
 
 bbox = [[-1, 1], [-1, 1]]
 
@@ -17,12 +16,16 @@ def f_ex(pts):
 def fd_disc(pts):
     return dcircle(pts, 0.0, 0.0, 1.0)
 
-def ex_disc():
-    h0 = 0.15
+def ex_disc(h0):
     print "  meshing ..."
-    pts, mytri = distmesh2d(fd_disc, huniform, h0, bbox, [])
+    p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
+    pts, mytri = fixmesh(p1,t1)
+    print mytri
+    edges, tedges = edgelist(pts,mytri)
+    print edges
+    print tedges
     fig1 = plt.figure()
-    plot_mesh(pts, mytri)
+    plot_mesh_indexed(pts, mytri, h0)
     uh, inside = poisson(f_ex,fd_disc,h0,pts,mytri,announce=True)
     print "  plotting ..."
     fig2 = plt.figure()
@@ -30,14 +33,13 @@ def ex_disc():
     ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
     uexact = 1.0 - pts[:,0]**2.0 - pts[:,1]**2.0   # exact:  u(x,y) = 1 - x^2 - y^2
     err = max(abs(uh-uexact))
-    print "error = %f" % err
+    print "max error = %f" % err
 
 def fd_ell(pts):
     return ddiff(drectangle(pts, -1, 1, -1, 1), drectangle(pts, -2, 0, -2, 0))
 
-def ex_ell():
+def ex_ell(h0):
     pfix = [[1,1], [1, -1], [0, -1], [0, 0], [-1, 0], [-1, 1]]
-    h0 = 0.15
     plotmethod = 2
     print "  meshing ..."
     fig1 = plt.figure()
@@ -58,5 +60,5 @@ def ex_ell():
         ax.plot_trisurf(pts[:,0], pts[:,1], uh, TRI.triangles, cmap=cm.jet, linewidth=0.2)
 
 if __name__ == '__main__':
-    ex_disc()
-    show()
+    ex_disc(0.6)
+    plt.show()

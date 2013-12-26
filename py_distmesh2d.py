@@ -2,8 +2,10 @@
 import numpy as np
 from numpy import sqrt, sum, vstack
 
-__all__ = ["distmesh2d", "dcircle", "drectangle", "ddiff",
-           "dintersect", "dunion", "huniform", "fixmesh"]
+__all__ = ["distmesh2d", "fixmesh", "longedgelist", "edgelist",
+           "dcircle", "drectangle",
+           "ddiff", "dintersect", "dunion",
+           "huniform"]
 
 try:
     from scipy.spatial import Delaunay
@@ -47,6 +49,74 @@ def fixmesh(pts, tri):
             tri[k, 2], tri[k, 1] = tri[k, 1], tri[k, 2]
 
     return pts, tri
+
+def longedgelist(pts, tri):
+    """From a triangulation (pts,tri) create a 'long' list of edges, with
+    redundancies.
+
+    in:  pts = list of points (nx2)
+         tri = list indices into pts defining a triangulation (Nx3)
+    out: longe = a sorted list of edges with three entries per triangle.
+    
+    For each edge in each triangle, longe has a row of indices
+         [ p0, p1, f, e ]
+    where p0 < p1 = indices of the endpoints,
+          f       = index into tri that this edge came from, and
+          e       = {0,1,2} for which of the three edges it is.
+    The shape of longe is  (m,4)  where m = 3N if N is the number of triangles.
+
+    Sorting: longe is sorted in increasing order by p0, and then in increasing
+    order by p1 if p0 are equal.
+
+    Example:  If  tri[42,:] = [ 3, 9, 7 ]  then we will put these
+    three entries in the long edge list:
+        ...
+        [ 3 7 42 2 ]
+        [ 3 9 42 0 ]
+        ...
+        [ 7 9 42 1 ]
+        ...
+    """
+    N = np.shape(tri)[0]
+    longe = np.zeros((N*3,4),dtype=np.int32)
+    for i in range(N):
+        for j in range(3):
+            M = tri[i,j]
+            m = tri[i,np.mod(j+1,3)]
+            if M < m:
+                M, m = m, M
+            eindex = 3*i + j
+            longe[eindex] = [m, M, i, j] 
+    # sort the long edge list so that p0 increases
+    longe = longe[longe[:,0].argsort(),]
+    # for equal p0, sort so that p1 increases
+    for i in range(np.shape(pts)[0]):
+        tmp = longe[longe[:,0]==i,:]
+        if len(tmp)>0:   # in some cases p0 may not be a first point value
+            longe[longe[:,0]==i] = tmp[tmp[:,1].argsort(),]
+    return longe
+
+def edgelist(pts, tri):
+    """From a triangulation (pts,tri) extract a list of unique edges.  Also get
+    a list of the triangles by their edges.
+    in:  pts = list of points (nx2)
+         tri = list indices into pts defining a triangulation (Nx3)
+    out: e   = for each edge a list of indices into p defining the
+               endpoints of the edge (mx2)
+         te  = for each triangle in the triangulation a list of indices
+               into e of the associated edges (Nx3)
+    """
+    longe = longedgelist(pts,tri)
+    tmp = longe[:,[0,1]]
+    d = ( np.sum(abs(np.diff(tmp,axis=0)),axis=1) != 0 ) # Tag unique elements
+    d = np.concatenate(([True],d))
+    e = longe[d][:,[0,1]]      # extract unique elements
+
+    te = np.zeros(np.shape(tri),dtype=np.int32)
+    ecum = np.cumsum(d) - 1
+    for k in range(np.shape(longe)[0]):
+       te[longe[k,2],longe[k,3]] = ecum[k]
+    return e, te
 
 def distmesh2d(fd, fh, h0, bbox, pfix, *args):
     """A re-implementation of the MATLAB distmesh2d function by Persson and Strang.

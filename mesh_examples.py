@@ -1,6 +1,7 @@
-from pylab import figure, triplot, tripcolor, axis, axes, show
-from py_distmesh2d import *
+from pylab import figure, show
 import numpy as np
+from py_distmesh2d import *
+from meshtools import plot_mesh
 
 def example1(pts):
     return dcircle(pts, 0, 0, 1)
@@ -29,14 +30,6 @@ def star(pts):
 
 def circle_h(pts):
     return 0.1 - example1(pts)
-
-def plot_mesh(pts, tri, *args):
-    if len(args) > 0:
-        tripcolor(pts[:,0], pts[:,1], tri, args[0], edgecolor='black', cmap="Blues")
-    else:
-        triplot(pts[:,0], pts[:,1], tri, "k-", lw=2)
-    axis('tight')
-    axes().set_aspect('equal')
 
 bbox = [[-1, 1], [-1, 1]]
 square = [[-1,-1], [-1,1], [1,-1], [1,1]]
