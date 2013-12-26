@@ -6,8 +6,6 @@ To do demo:
 
     $ python poisson.py
 
-gives:
-
-![disc mesh](https://github.com/bueler/py_fem_distmesh2d/raw/master/ex_disc_mesh.png)
+gives this solution plot:
 
 ![disc solution](https://github.com/bueler/py_fem_distmesh2d/raw/master/ex_disc_soln.png)
