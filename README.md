@@ -1,14 +1,13 @@
-This repository contains a Python re-implementation of `distmesh2d` in *P.-O. Persson, G. Strang, A Simple Mesh Generator in MATLAB. SIAM Review, Volume 46 (2), pp. 329-345, June 2004* (http://persson.berkeley.edu/distmesh/).
+This repo adds some FEM examples to Constantine's [py_distmesh2d](https://github.com/ckhroulev/py_distmesh2d).
 
-* This code implements the original function described in the 2004 paper and
-  does not include any improvements,
-* Using NumPy makes it about as short as the original MATLAB version.
-* `scipy.spatial.Delaunay` (present in SciPy >= 0.9.0) is used to compute
-   Delaunay triangulations. Alternatively `matplotlib.delaunay` (present in
-   `matplotlib` >= 0.8) can be used.
-* The script `examples.py` requires `matplotlib` >= 1.0.
-* This code is in an *"alpha"* stage and will probably stay that way.
+The codes `py_distmesh2d.py` and `examples.py` are a Python re-implementation of `distmesh2d` in *P.-O. Persson, G. Strang, A Simple Mesh Generator in MATLAB. SIAM Review, Volume 46 (2), pp. 329-345, June 2004* (http://persson.berkeley.edu/distmesh/).
 
-It seems to work, though:
+To do demo:
 
-![example 3](https://raw.github.com/ckhroulev/py_distmesh2d/master/example3.png)
+    $ python poisson.py
+
+gives:
+
+![disc mesh](https://raw.github.com/ckhroulev/py_distmesh2d/master/ex_disc_mesh.png)
+
+![disc solution](https://raw.github.com/ckhroulev/py_distmesh2d/master/ex_disc_soln.png)
