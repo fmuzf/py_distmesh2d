@@ -8,6 +8,6 @@ To do demo:
 
 gives:
 
-![disc mesh](https://raw.github.com/ckhroulev/py_distmesh2d/master/ex_disc_mesh.png)
+![disc mesh](https://github.com/bueler/py_fem_distmesh2d/raw/master/ex_disc_mesh.png)
 
-![disc solution](https://raw.github.com/ckhroulev/py_distmesh2d/master/ex_disc_soln.png)
+![disc solution](https://github.com/bueler/py_fem_distmesh2d/raw/master/ex_disc_soln.png)
