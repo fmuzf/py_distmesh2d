@@ -27,6 +27,9 @@ def ex_disc():
     fig2 = plt.figure()
     ax = fig2.gca(projection='3d')
     ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
+    uexact = 1.0 - pts[:,0]**2.0 - pts[:,1]**2.0   # exact:  u(x,y) = 1 - x^2 - y^2
+    err = max(abs(uh-uexact))
+    print "error = %f" % err
 
 def fd_ell(pts):
     return ddiff(drectangle(pts, -1, 1, -1, 1), drectangle(pts, -2, 0, -2, 0))
