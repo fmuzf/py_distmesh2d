@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from py_distmesh2d import *
 from poisson import poisson
-from meshtools import plot_mesh, plot_mesh_indexed
+from meshtools import plotmesh, fixmesh, edgelist, bdyrefine
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm, tri
@@ -20,18 +20,49 @@ def ex_disc(h0):
     print "  meshing ..."
     p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
     pts, mytri = fixmesh(p1,t1)
-    print mytri
-    edges, tedges = edgelist(pts,mytri)
-    print edges
-    print tedges
     fig1 = plt.figure()
-    plot_mesh_indexed(pts, mytri, h0)
+    plotmesh(pts, mytri)
     uh, inside = poisson(f_ex,fd_disc,h0,pts,mytri,announce=True)
     print "  plotting ..."
     fig2 = plt.figure()
     ax = fig2.gca(projection='3d')
     ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
     uexact = 1.0 - pts[:,0]**2.0 - pts[:,1]**2.0   # exact:  u(x,y) = 1 - x^2 - y^2
+    err = max(abs(uh-uexact))
+    print "max error = %f" % err
+
+def ex_disc_refine(h0):
+    print "  meshing ..."
+    p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
+    pts, mytri = fixmesh(p1,t1)
+    edges, tedges = edgelist(pts,mytri)
+    print "  original mesh has %d nodes and %d edges" % (np.shape(pts)[0],np.shape(edges)[0])
+    fig1 = plt.figure()
+    if h0 >= 0.3:
+        plotmesh(pts, mytri, index=True, h0=h0)  # also add kwarg edges=edges if desired
+    else:
+        plotmesh(pts, mytri)
+    plt.title('original mesh')
+    print "  refining once ..."
+    rpone, rtone, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
+    roneedges, tmp = edgelist(rpone,rtone)
+    print "  first refined mesh has %d nodes and %d edges" % (np.shape(rpone)[0],np.shape(roneedges)[0])
+    fig2 = plt.figure()
+    plotmesh(rpone, rtone)
+    plt.title('first refined mesh')
+    print "  refining again ..."
+    rp, rt, e, ind = bdyrefine(rpone,rtone,fd_disc,h0)
+    redges, tmp = edgelist(rp,rt)
+    print "  second refined mesh has %d nodes and %d edges" % (np.shape(rp)[0],np.shape(redges)[0])
+    fig3 = plt.figure()
+    plotmesh(rp, rt)
+    plt.title('second refined mesh')
+    uh, inside = poisson(f_ex,fd_disc,h0,rp,rt,announce=True)
+    print "  plotting ..."
+    fig4 = plt.figure()
+    ax = fig4.gca(projection='3d')
+    ax.plot_trisurf(rp[:,0], rp[:,1], uh, cmap=cm.jet, linewidth=0.2)
+    uexact = 1.0 - rp[:,0]**2.0 - rp[:,1]**2.0   # exact:  u(x,y) = 1 - x^2 - y^2
     err = max(abs(uh-uexact))
     print "max error = %f" % err
 
@@ -45,12 +76,12 @@ def ex_ell(h0):
     fig1 = plt.figure()
     p1, t1 = distmesh2d(fd_ell, huniform, h0, bbox, pfix)
     pts, mytri = fixmesh(p1,t1)
-    plot_mesh(pts, mytri)
+    plotmesh(pts, mytri)
     uh, inside = poisson(f_ex,fd_ell,h0,pts,mytri,announce=True)
     print "  plotting ..."
     fig2 = plt.figure()
     if plotmethod == 1:
-        plot_mesh(pts, tri, uh)
+        plotmesh(pts, tri, uh)
     elif plotmethod == 2:
         ax = fig2.gca(projection='3d')
         ax.scatter(pts[:,0], pts[:,1], uh, c=uh, cmap=cm.jet)
@@ -60,5 +91,5 @@ def ex_ell(h0):
         ax.plot_trisurf(pts[:,0], pts[:,1], uh, TRI.triangles, cmap=cm.jet, linewidth=0.2)
 
 if __name__ == '__main__':
-    ex_disc(0.6)
+    ex_disc_refine(0.4)
     plt.show()

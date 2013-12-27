@@ -1,7 +1,7 @@
 from pylab import figure, show
 import numpy as np
 from py_distmesh2d import *
-from meshtools import plot_mesh
+from meshtools import plotmesh
 
 def example1(pts):
     return dcircle(pts, 0, 0, 1)
@@ -38,56 +38,56 @@ square = [[-1,-1], [-1,1], [1,-1], [1,1]]
 def example_1a():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.4, bbox, [])
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # example 1b
 def example_1b():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.2, bbox, [])
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # example 1c
 def example_1c():
     figure()
     pts, tri = distmesh2d(example1, huniform, 0.1, bbox, [])
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # example 2
 def example_2():
     figure()
     pts, tri = distmesh2d(example2, huniform, 0.1, bbox, [])
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # example 3a
 def example_3a():
     figure()
     pts, tri = distmesh2d(example3, huniform, 0.15, bbox, square)
-    plot_mesh(pts, tri, example3(pts))
+    plotmesh(pts, tri, example3(pts))
     show()
 
 # example 3b
 def example_3b():
     figure()
     pts, tri = distmesh2d(example3, example3_h, 0.035, bbox, square)
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # example (current online version)
 def example_3_online():
     figure()
     pts, tri = distmesh2d(example3_online, example3_online_h, 0.02, bbox, square)
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # annulus, non-uniform
 def annulus():
     figure()
     pts, tri = distmesh2d(example2, annulus_h, 0.04, bbox, square)
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # a "star" built using circles
@@ -96,7 +96,7 @@ def star_mesh():
     # fake the corners:
     pfix = [[0.25, 0.25], [-0.25, 0.25], [-0.25, -0.25], [0.25, -0.25]]
     pts, tri = distmesh2d(star, huniform, 0.1, bbox, pfix)
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 # a circle, finer mesh near the boundary
@@ -104,7 +104,7 @@ def circle_nonuniform():
     figure()
     # fake the corners:
     pts, tri = distmesh2d(example1, circle_h, 0.1, bbox, [])
-    plot_mesh(pts, tri)
+    plotmesh(pts, tri)
     show()
 
 def ell():
@@ -117,6 +117,9 @@ def ell():
         return ddiff(drectangle(pts, -1, 1, -1, 1), drectangle(pts, -2, 0, -2, 0))
 
     figure()
-    pts, tri = distmesh2d(d, huniform, 0.1, bbox, pfix)
-    plot_mesh(pts, tri)
+    pts, tri = distmesh2d(d, huniform, 0.25, bbox, pfix)
+    plotmesh(pts, tri)
     show()
+
+if __name__ == '__main__':
+    example_3_online()

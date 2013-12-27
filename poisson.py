@@ -2,7 +2,6 @@ from py_distmesh2d import *
 import numpy as np
 from numpy.linalg import det, inv, solve
 
-
 def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
     """Solve Poisson's equation on a domain D by the FE method:
          - Laplacian u = f_rhs
@@ -22,7 +21,7 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
     Npts = np.shape(pts)[0]     # = number of nodes
     N = ii.sum()                # = number of *interior* nodes
     if announce:
-        print "  poisson: assembling on mesh with  %d  nodes and  %d  interior nodes ..." \
+        print "  poisson: assembling on mesh with  %d  nodes and  %d  interior nodes" \
             % (Npts,N)
     inside = np.zeros(Npts,dtype=np.int32) # index only the interior nodes
     count = 0
@@ -72,7 +71,7 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
             A[vk,vl] += ar * Q[0,1]
             A[vl,vk] = A[vk,vl]
     if announce:
-        print "  poisson: solving linear system  A uh = b  with  N = %d  unknowns ..." % N
+        print "  poisson: solving linear system  A uh = b  with  N = %d  unknowns" % N
     uh = np.zeros(Npts)
     uh[ii] = solve(A,b)
     return uh, inside
