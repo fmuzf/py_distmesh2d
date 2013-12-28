@@ -74,5 +74,8 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
         print "  poisson: solving linear system  A uh = b  with  N = %d  unknowns" % N
     uh = np.zeros(Npts)
     uh[ii] = solve(A,b)
-    return uh, inside
+    if kwargs.get('getsys',False):
+        return uh, inside, A, b
+    else:
+        return uh, inside
 
