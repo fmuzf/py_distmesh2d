@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm, tri
 
 from py_distmesh2d import *
-from meshtools import plotmesh, fixmesh
+from meshtools import plotmesh, fixmesh, bdyrefine
 from poisson import poisson
 
 bbox = [[-1, 1], [-1, 1]]
@@ -19,18 +19,26 @@ def psi_ex(pts):
     return -np.sum((3.0*pts)**4.0,axis=1)+1.0
 
 def obscircle(h0):
-    print "  meshing ..."
+    print "  meshing and fixing mesh ..."
     p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
-    pts, mytri = fixmesh(p1,t1)
-    fig1 = plt.figure()
-    plotmesh(pts, mytri)
+    p1a, t1a = fixmesh(p1,t1)
+    print "     ... original mesh has %d nodes" % np.shape(p1a)[0]
+
+    print "  refining mesh once ..."
+    p2, t2, e, ind = bdyrefine(p1a,t1a,fd_disc,h0)
+    print "     ... first refined mesh has %d nodes" % np.shape(p2)[0]
+    print "  refining mesh again ..."
+    pts, mytri, e, ind = bdyrefine(p2,t2,fd_disc,h0)
+    print "     ... second refined mesh has %d nodes" % np.shape(pts)[0]
 
     print "  solving ..."
-    uh, ii, ierr = obstacle(psi_ex, f_ex, 1.0e-6, fd_disc, h0, pts, mytri, \
+    tol = 1.0e-6
+    uh, ii, ierr = obstacle(psi_ex, f_ex, tol, fd_disc, h0, pts, mytri, \
                             announce=True)
-    print "          ... %d iterations total" % len(ierr)
+    print "          ... %d iterations total to reach iteration tolerance %.2e" \
+        % (len(ierr), tol)
 
-    print "  plotting solution over obstacle ..."
+    # FIXME: show coincidence set at black dots?
     fig2 = plt.figure()
     ax = fig2.gca(projection='3d')
     ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
@@ -40,17 +48,10 @@ def obscircle(h0):
     ax.set_ylim3d(-1.0,1.0)
     ax.set_zlim3d(-1.0,2.0)
 
-    print "  plotting solution as scatter ..."
-    fig3 = plt.figure()
-    ax = fig3.gca(projection='3d')
-    ax.scatter(pts[:,0], pts[:,1], uh, c=uh, cmap=cm.jet)
-
-    print "  plotting error ..."
     fig4 = plt.figure()
-    plt.plot(np.array(range(len(ierr)))+1.0,ierr)
-    #plt.semilogy(np.array(range(len(ierr)))+1.0,ierr)
+    plt.semilogy(np.array(range(len(ierr)))+1.0,ierr,'o-')
     plt.xlabel('j = iteration')
-    plt.ylabel('max norm error at j')
+    plt.ylabel('max diff successive iterations')
     plt.grid(True)
 
 
@@ -71,8 +72,7 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
         print "  obstacle: asking poisson() for linear system"
     # use poisson to get unconstrained stiffness, load
     uhpoisson, inside, AA, bb = poisson(f_ex,fd_disc,h0,pts,tri,announce=True,getsys=True)
-    #omega = 1.75     # found by trial and error
-    omega = 0.75     # found by trial and error  FIXME: huh?
+    omega = 1.75     # found by trial and error
     maxiter = 300
     Npts = np.shape(pts)[0]            # = number of nodes
     geps = 0.001 * h0
@@ -98,7 +98,7 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
             if j == 0:
                 utmp = (bb[j] - Ux[j]) / dd[j]
             else:
-                utmp = (bb[j] - np.dot(LL[j,:j-1],unew[:j-1]) - Ux[j]) / dd[j]
+                utmp = (bb[j] - np.dot(LL[j,:j],unew[:j]) - Ux[j]) / dd[j]
             # over-relax and project up to psi if needed
             unew[j] = np.maximum(omcomp * uold[j] + omega * utmp, ps[j])
         er = max(abs(unew-uold))
@@ -111,11 +111,8 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
 
     uh = uhpoisson.copy()
     uh[ii] = unew
-    #h=trimesh(t,p(:,1),p(:,2),uh);  set(h,'FaceAlpha',0.3)  % plot transparent
-    #xy=[get(gca,'Xlim') get(gca,'YLim')];  hold on;
-    #trisurf(t,p(:,1),p(:,2),psi(p),uh);  axis([xy min(uh) max(uh)]);  hold off;
     return uh, ii, ierr
 
 if __name__ == '__main__':
-    obscircle(0.1)
+    obscircle(0.2)
     plt.show()
