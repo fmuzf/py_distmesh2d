@@ -1,59 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm, tri
-
-from py_distmesh2d import *
-from meshtools import plotmesh, fixmesh, bdyrefine
 from poisson import poisson
-
-bbox = [[-1, 1], [-1, 1]]
-
-def fd_disc(pts):
-    return dcircle(pts, 0.0, 0.0, 1.0)
-
-def f_ex(pts):
-    return 0.0
-
-def psi_ex(pts):
-    return -np.sum((3.0*pts)**4.0,axis=1)+1.0
-
-def obscircle(h0):
-    print "  meshing and fixing mesh ..."
-    p1, t1 = distmesh2d(fd_disc, huniform, h0, bbox, [])
-    p1a, t1a = fixmesh(p1,t1)
-    print "     ... original mesh has %d nodes" % np.shape(p1a)[0]
-
-    print "  refining mesh once ..."
-    p2, t2, e, ind = bdyrefine(p1a,t1a,fd_disc,h0)
-    print "     ... first refined mesh has %d nodes" % np.shape(p2)[0]
-    print "  refining mesh again ..."
-    pts, mytri, e, ind = bdyrefine(p2,t2,fd_disc,h0)
-    print "     ... second refined mesh has %d nodes" % np.shape(pts)[0]
-
-    print "  solving ..."
-    tol = 1.0e-6
-    uh, ii, ierr = obstacle(psi_ex, f_ex, tol, fd_disc, h0, pts, mytri, \
-                            announce=True)
-    print "          ... %d iterations total to reach iteration tolerance %.2e" \
-        % (len(ierr), tol)
-
-    # FIXME: show coincidence set at black dots?
-    fig2 = plt.figure()
-    ax = fig2.gca(projection='3d')
-    ax.plot_trisurf(pts[:,0], pts[:,1], uh, cmap=cm.jet, linewidth=0.2)
-    psi = np.maximum(psi_ex(pts),-1.0*np.ones(np.shape(pts)[0]))
-    ax.plot_trisurf(pts[:,0], pts[:,1], psi, cmap=cm.Blues, linewidth=0.1)
-    ax.set_xlim3d(-1.0,1.0)
-    ax.set_ylim3d(-1.0,1.0)
-    ax.set_zlim3d(-1.0,2.0)
-
-    fig4 = plt.figure()
-    plt.semilogy(np.array(range(len(ierr)))+1.0,ierr,'o-')
-    plt.xlabel('j = iteration')
-    plt.ylabel('max diff successive iterations')
-    plt.grid(True)
-
 
 def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
     """Solve the obstacle problem
@@ -71,9 +17,9 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
     if announce:
         print "  obstacle: asking poisson() for linear system"
     # use poisson to get unconstrained stiffness, load
-    uhpoisson, inside, AA, bb = poisson(f_ex,fd_disc,h0,pts,tri,announce=True,getsys=True)
+    uhpoisson, inside, AA, bb = poisson(f_rhs,f_dist,h0,pts,tri,announce=True,getsys=True)
     omega = 1.75     # found by trial and error
-    maxiter = 300
+    maxiter = 500
     Npts = np.shape(pts)[0]            # = number of nodes
     geps = 0.001 * h0
     ii = (f_dist(pts, *args) < -geps)  # boolean array for interior nodes
@@ -108,11 +54,8 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
             break
         if l == maxiter:
             print 'WARNING: max number of iterations reached'
-
+    # construct solution by filling interior values and boundary values
     uh = uhpoisson.copy()
     uh[ii] = unew
     return uh, ii, ierr
 
-if __name__ == '__main__':
-    obscircle(0.2)
-    plt.show()
