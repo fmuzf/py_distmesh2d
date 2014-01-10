@@ -15,7 +15,7 @@ def obstacle(psi,f_rhs,tol,f_dist,h0,pts,tri,*args,**kwargs):
     """
     announce = kwargs.get('announce',False)
     if announce:
-        print "  obstacle: asking poisson() for linear system"
+        print "  obstacle: asking poisson() for linear system and unconstrained soln ..."
     # use poisson to get unconstrained stiffness, load
     uhpoisson, inside, AA, bb = poisson(f_rhs,f_dist,h0,pts,tri,announce=True,getsys=True)
     omega = 1.75     # found by trial and error

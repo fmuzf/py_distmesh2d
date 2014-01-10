@@ -182,5 +182,5 @@ def plotmesh(pts, tri, *args, **kwargs):
                 y = np.sum(pts[edges[k,:],1]) / 2.0
                 text(x+dx,y-dx,'%d' % k, color='r')
     axis('tight')
-    axes().set_aspect('equal')
+    axis('equal')
 

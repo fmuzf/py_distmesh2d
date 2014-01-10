@@ -38,25 +38,20 @@ def ex_disc_refine(h0):
     edges, tedges = edgelist(pts,mytri)
     print "  original mesh has %d nodes and %d edges" % (np.shape(pts)[0],np.shape(edges)[0])
     fig1 = plt.figure()
-    if h0 >= 0.3:
-        plotmesh(pts, mytri, index=True, h0=h0)  # also add kwarg edges=edges if desired
-    else:
-        plotmesh(pts, mytri)
+    plt.subplot(1,2,1)
+    plotmesh(pts, mytri)
     plt.title('original mesh')
     print "  refining once ..."
     rpone, rtone, e, ind = bdyrefine(pts,mytri,fd_disc,h0)
     roneedges, tmp = edgelist(rpone,rtone)
     print "  first refined mesh has %d nodes and %d edges" % (np.shape(rpone)[0],np.shape(roneedges)[0])
-    fig2 = plt.figure()
-    plotmesh(rpone, rtone)
-    plt.title('first refined mesh')
     print "  refining again ..."
     rp, rt, e, ind = bdyrefine(rpone,rtone,fd_disc,h0)
     redges, tmp = edgelist(rp,rt)
-    print "  second refined mesh has %d nodes and %d edges" % (np.shape(rp)[0],np.shape(redges)[0])
-    fig3 = plt.figure()
+    print "  final refined mesh has %d nodes and %d edges" % (np.shape(rp)[0],np.shape(redges)[0])
+    plt.subplot(1,2,2)
     plotmesh(rp, rt)
-    plt.title('second refined mesh')
+    plt.title('final refined mesh')
     uh, inside = poisson(f_ex,fd_disc,h0,rp,rt,announce=True)
     print "  plotting ..."
     fig4 = plt.figure()
@@ -91,5 +86,5 @@ def ex_ell(h0):
         ax.plot_trisurf(pts[:,0], pts[:,1], uh, TRI.triangles, cmap=cm.jet, linewidth=0.2)
 
 if __name__ == '__main__':
-    ex_disc_refine(0.4)
+    ex_disc_refine(0.2)
     plt.show()

@@ -65,11 +65,8 @@ def obscircle(h0,psifcn):
     p2, t2, e, ind = bdyrefine(p1a,t1a,fd_disc,h0)
     print "     ... first refined mesh has %d nodes" % np.shape(p2)[0]
     print "  refining mesh again ..."
-    p3, t3, e, ind = bdyrefine(p2,t2,fd_disc,h0)
-    print "     ... second refined mesh has %d nodes" % np.shape(p3)[0]
-    print "  refining mesh again ..."
-    pts, mytri, e, ind = bdyrefine(p3,t3,fd_disc,h0)
-    print "     ... third refined mesh has %d nodes" % np.shape(pts)[0]
+    pts, mytri, e, ind = bdyrefine(p2,t2,fd_disc,h0)
+    print "     ... second refined mesh has %d nodes" % np.shape(pts)[0]
 
     print "  solving ..."
     tol = 1.0e-6
@@ -99,6 +96,7 @@ def obscircle(h0,psifcn):
     plt.grid(True)
 
     if psifcn == psi_sphere:
+        print
         print 'for sphere obstacle, exact solution is known:'
         print '  (away from the obstacle:  u(r) = b log(r) )'
         apart = (uh > psi)
@@ -106,5 +104,5 @@ def obscircle(h0,psifcn):
 
 if __name__ == '__main__':
     #obscircle(0.2,psi_fourth)
-    obscircle(0.2,psi_sphere)  # smallest that works:  0=0.75*0.125
+    obscircle(0.2,psi_sphere)
     plt.show()
