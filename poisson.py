@@ -1,6 +1,16 @@
 from py_distmesh2d import *
 import numpy as np
-from numpy.linalg import det, inv, solve
+from cg import cg
+
+def det2(A):
+    '''Determinant of 2x2 matrix.'''
+    return A[0,0] * A[1,1] - A[1,0] * A[0,1]
+
+def inv2(A):
+    '''Inverse of 2x2 matrix.'''
+    d = det2(A)
+    adj = np.array([[A[1,1], -A[0,1]], [-A[1,0], A[0,0]]])
+    return adj / d
 
 def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
     """Solve Poisson's equation on a domain D by the FE method:
@@ -47,9 +57,9 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
         vl = inside[l]
         Jac = np.array([[ pts[k,0] - pts[j,0], pts[l,0] - pts[j,0] ],
                         [ pts[k,1] - pts[j,1], pts[l,1] - pts[j,1] ]])
-        ar = abs(det(Jac))/2.0
+        ar = abs(det2(Jac))/2.0
         C = ar/12.0
-        Q = inv(np.dot(Jac.transpose(),Jac))
+        Q = inv2(np.dot(Jac.transpose(),Jac))
         fT = np.array([ff[j], ff[k], ff[l]])
         # add triangle's contribution to linear system  A x = b
         if ii[j]:
@@ -71,9 +81,18 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
             A[vk,vl] += ar * Q[0,1]
             A[vl,vk] = A[vk,vl]
     if announce:
-        print "  poisson: solving linear system  A uh = b  with  N = %d  unknowns" % N
+        print "  poisson: solving linear system  A uh = b  using cg (N=%d unknowns)" % N
     uh = np.zeros(Npts)
-    uh[ii] = solve(A,b)
+    # solve by cg including (weak) test of positive definiteness
+    uh[ii], iters, r = cg(A,b,np.zeros(np.shape(b)),tol=1.0e-4,h=h0,test=True)
+    #from numpy.linalg import solve
+    #uh[ii] = solve(A,b)
+    if (announce & (not(kwargs.get('getsys',False)))):
+        if np.dot(b,b) > 0.0:
+          err = np.sqrt(np.dot(r,r) / np.dot(b,b))
+          print "  poisson: cg did  %d  iterations to get |r|/|b| = %.4e" % (iters,err)
+        else:
+          print "  poisson: cg did  %d  iterations" % iters
     if kwargs.get('getsys',False):
         return uh, inside, A, b
     else:
