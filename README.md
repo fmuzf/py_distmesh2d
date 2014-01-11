@@ -9,11 +9,11 @@ What's new?:
 
 * `meshtools.py`: Python re-implementations of codes from the [Math 692 one-page Matlab FEM code challenge](http://www.dms.uaf.edu/~bueler/challenge.htm), which dates to Fall 2004.  These tools include `fixmesh`, `edgelist`, and `bdyrefine`
 
-* `cg.py`: Boring implementation of the conjugate gradient method.  See *H. Elman, D. Silvester, and A. Wathen, Finite Elements and Fast Iterative Solvers with applications in incompressible fluid dynamics.  Oxford 2005.*
+* `cg.py`: Boring implementation of the conjugate gradient method.  (See *H. Elman, D. Silvester, and A. Wathen, Finite Elements and Fast Iterative Solvers with applications in incompressible fluid dynamics.  Oxford 2005.*)  This way we don't even need `numpy.linalg.solve`.  In practice, performance for PDE problems here (as opposed to variational inequality problems) is limited by meshing, not linear algebra.
 
-* `poisson.py`: Assemble and solve Poisson equation del^2 u = f.
+* `poisson.py`: Assemble and solve Poisson equation del^2 u = f.  See also http://www.cs.uaf.edu/~bueler/poissonv2.pdf
 
-* `obstacle.py`: Solve the obstacle problem associated to the Poisson equation.
+* `obstacle.py`: Solve the obstacle problem associated to the Poisson equation.  That is, solve the variational inequality.  See also http://www.dms.uaf.edu/~bueler/obstacleDOC.pdf
 
 Demos:
 
