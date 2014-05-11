@@ -1,4 +1,4 @@
-from py_distmesh2d import *
+from distmesh2d import *
 import numpy as np
 from cg import cg
 
@@ -20,7 +20,7 @@ def poisson(f_rhs,f_dist,h0,pts,tri,*args,**kwargs):
     on boundary of D.   The right-hand side is  f = f_rhs(pts,*args).
     We use a triangulation described by points pts, triangles tri,
     a mesh scale h0, and a signed distance function f_dist(pts,*args);
-    see py_distmesh2d.py.  Returns
+    see distmesh2d.py.  Returns
        uh     = approximate solution value at pts
        inside = index of interior point (or -1 if not interior)
     See fem_examples.py for examples.

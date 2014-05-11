@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from py_distmesh2d import *
+from distmesh2d import *
 from poisson import poisson
-from meshtools import plotmesh, fixmesh, edgelist, bdyrefine
+from distmesh2d.meshtools import plotmesh, fixmesh, edgelist, bdyrefine
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm, tri

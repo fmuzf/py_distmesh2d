@@ -3,5 +3,5 @@ all:
 .PHONY: clean
 
 clean:
-	@rm -f *.pyc *~
+	@rm -rf *.pyc *~ dist distmesh2d.egg-info build
 

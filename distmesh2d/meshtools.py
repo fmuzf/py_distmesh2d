@@ -1,5 +1,5 @@
 from pylab import triplot, tripcolor, axis, axes, text
-from py_distmesh2d import *
+import distmesh2d
 import numpy as np
 
 __all__ = ["fixmesh", "longedgelist", "edgelist", "bdyrefine", "plotmesh"]

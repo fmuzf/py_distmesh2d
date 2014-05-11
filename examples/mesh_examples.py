@@ -1,7 +1,7 @@
 from pylab import figure, show
 import numpy as np
-from py_distmesh2d import *
-from meshtools import plotmesh
+from distmesh2d import *
+from distmesh2d.meshtools import plotmesh
 
 def example1(pts):
     return dcircle(pts, 0, 0, 1)
